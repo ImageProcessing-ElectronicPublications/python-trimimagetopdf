@@ -8,7 +8,7 @@ With a certain modification of the script, you can build a tailing generator RDF
 
 Depends: PIL, reportlab
 
-Usage: trimimagetopdf.py [-h] [-a] [-d dpi] [-o outfile] imgname
+Usage: trimimagetopdf.py [-h] [-a] [-d dpi] [-o outfile] [-v] imgname
 
 Trim the image and creates a PDF with the same size
 
