@@ -24,7 +24,7 @@ from reportlab.pdfgen.canvas import Canvas
 from PIL import Image, ImageChops, ImageFilter
 
 PROGNAME='TrimImagetoPDF'
-VERSION='0.20171211'
+VERSION='0.20171224'
 
 def export_pdf(imgname, autotm, default_dpi, outfile):
   """Trim the image and creates a PDF with the same size"""
@@ -41,7 +41,10 @@ def export_pdf(imgname, autotm, default_dpi, outfile):
   if autotm:
     trimbox = autocrop(im, 255)
   else:
-    trimbox = trim(im, (255,255,255))
+    if im.mode == "RGB":
+      trimbox = trim(im, (255,255,255))
+    else:
+      trimbox = trim(im, 255)
   if trimbox:
     print trimbox
     x1, y1, x2, y2 = trimbox
