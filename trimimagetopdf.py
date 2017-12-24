@@ -35,13 +35,17 @@ def export_pdf(imgname, autotm, default_dpi, outfile):
   dpi = default_dpi
   im = Image.open(imgname)
   w, h = im.size
+  clm = im.mode
   width = round(w * 72.0 / dpi, 3)
   height = round(h * 72.0 / dpi, 3)
   pdf.setPageSize((width, height))
   if autotm:
     trimbox = autocrop(im, 255)
   else:
-    trimbox = trim(im, (255,255,255))
+    if clm == "RGB":
+      trimbox = trim(im, (255,255,255))
+    else:
+      trimbox = trim(im, 255)
   if trimbox:
     print trimbox
     x1, y1, x2, y2 = trimbox
