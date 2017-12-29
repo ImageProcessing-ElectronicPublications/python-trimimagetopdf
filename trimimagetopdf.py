@@ -23,11 +23,12 @@ PROGNAME = 'TrimImagetoPDF'
 VERSION = '0.20171225'
 
 
-def export_pdf(imgname, autotm, default_dpi, outfile):
+def export_pdf(imgname, autotm, default_dpi, outfile, tformat, tleft, ttop, twidth, theight):
     """Trim the image and creates a PDF with the same size."""
     if outfile == '':
         outfile = '%s.pdf' % (imgname)
-    outtrim = '%s-trim.png' % (outfile)
+    outtrim = '%s-trim.' % (outfile)
+    outtrim = outtrim + tformat
     pdf = Canvas(outfile, pageCompression=1)
     dpi = default_dpi
     im = Image.open(imgname)
@@ -35,13 +36,16 @@ def export_pdf(imgname, autotm, default_dpi, outfile):
     width = round(w * 72.0 / dpi, 3)
     height = round(h * 72.0 / dpi, 3)
     pdf.setPageSize((width, height))
-    if autotm:
-        trimbox = autocrop(im, 255)
-    else:
-        if im.mode == 'RGB':
-            trimbox = trim(im, (255, 255, 255))
+    if ((tleft < 0) or (ttop < 0) or (twidth < 0) or (theight < 0)):
+        if autotm:
+            trimbox = autocrop(im, 255)
         else:
-            trimbox = trim(im, 255)
+            if im.mode == 'RGB':
+                trimbox = trim(im, (255, 255, 255))
+            else:
+                trimbox = trim(im, 255)
+    else:
+        trimbox = (tleft, ttop, (tleft + twidth), (ttop + theight))
     if trimbox:
         print trimbox
         x1, y1, x2, y2 = trimbox
@@ -104,10 +108,45 @@ if __name__ == '__main__':
         default='',
         help='output pdf name, default imgname.pdf')
     parser.add_argument(
+        '-f',
+        '--format',
+        metavar='format',
+        type=str,
+        default='png',
+        help='format trim image, default png')
+    parser.add_argument(
+        '-l',
+        '--left',
+        metavar='left',
+        type=int,
+        default=-1,
+        help='use left, complit -ltwz, defaul -1')
+    parser.add_argument(
+        '-t',
+        '--top',
+        metavar='top',
+        type=int,
+        default=-1,
+        help='use top, complit -ltwz, defaul -1')
+    parser.add_argument(
+        '-w',
+        '--width',
+        metavar='width',
+        type=int,
+        default=-1,
+        help='use width, complit -ltwz, defaul -1')
+    parser.add_argument(
+        '-z',
+        '--height',
+        metavar='height',
+        type=int,
+        default=-1,
+        help='use height, complit -ltwz, defaul -1')
+    parser.add_argument(
         '-v',
         '--version',
         action='version',
         version=print_version())
     parser.add_argument('imgname', help='image file name')
     args = parser.parse_args()
-    export_pdf(args.imgname, args.auto, args.dpi, args.outfile)
+    export_pdf(args.imgname, args.auto, args.dpi, args.outfile, args.format, args.left, args.top, args.width, args.height)
